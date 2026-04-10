@@ -1,0 +1,148 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+    <title>Quote Generator</title>
+    <link rel="stylesheet" href="quote_generator.css">
+    </head>
+    <body>
+        
+<header>
+    <span class="logo">techpaathshala.</span>
+    <button class="btn-allquotes" onclick="openModal()">All Quotes</button>
+  </header>
+
+  <main>
+    <div class="card">
+      <h1><b>Let's Start Generating Quotes</b></h1>
+
+      <div class="quote-display" id="quote-display">
+        <p id="quote">"Stay hungry, stay foolish."</p>
+        <span id="Author">- Steve Jobs</span>
+      </div>
+
+      <button class="btn-generate" id="generate-quote">Generate Quote</button>
+
+      <div class="form-group">
+        <label>New Quote</label>
+        <input type="text" id="quote-input" placeholder="Enter a new quote...">
+      </div>
+
+      <div class="author-row">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="author-input" placeholder="Author name">
+        </div>
+        <button class="btn-add" id="add-quote">Add Quote</button>
+      </div>
+    </div>
+  </main>
+
+  All Quotes Modal
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>All Quotes</h2>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="quotes-list" id="quotes-list"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let quotes = [
+      { text: "Stay hungry, stay foolish.", author: "Steve Jobs" },
+      { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+      { text: "Be yourself; everyone else is already taken.", author: "Oscar Wilde" },
+      { text: "In the middle of every difficulty lies opportunity.", author: "Albert Einstein" },
+      { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+      { text: "Life is what happens when you're busy making other plans.", author: "John Lennon" }
+    ];
+
+    const quoteText   = document.getElementById('quote');
+    const quoteAuthor = document.getElementById('Author');
+    const display     = document.getElementById('quote-display');
+
+    // Generate random quote
+    document.getElementById('generate-quote').addEventListener('click', () => {
+      display.classList.add('fade');
+      setTimeout(() => {
+        const item = quotes[Math.floor(Math.random() * quotes.length)];
+        quoteText.innerText   = `"${item.text}"`;
+        quoteAuthor.innerText = `- ${item.author}`;
+        display.classList.remove('fade');
+      }, 300);
+    });
+
+    // Add new quote
+    document.getElementById('add-quote').addEventListener('click', () => {
+      const textInput   = document.getElementById('quote-input');
+      const authorInput = document.getElementById('author-input');
+
+      if (!textInput.value.trim() || !authorInput.value.trim()) {
+        showToast("Please fill in both fields.");
+        return;
+      }
+
+      quotes.push({ text: textInput.value.trim(), author: authorInput.value.trim() });
+      showToast("Quote added successfully!");
+      textInput.value   = "";
+      authorInput.value = "";
+    });
+
+    // All Quotes modal
+    function openModal() {
+      renderQuotesList();
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function renderQuotesList() {
+      const list = document.getElementById('quotes-list');
+      if (quotes.length === 0) {
+        list.innerHTML = `<p style="text-align:center;color:var(--muted);padding:24px 0;font-size:14px">No quotes yet. Add one!</p>`;
+        return;
+      }
+      list.innerHTML = quotes.map((q, i) => `
+        <div class="quote-item">
+          <div class="quote-item-row">
+            <div class="quote-item-text">
+              <p>"${q.text}"</p>
+              <span>- ${q.author}</span>
+            </div>
+            <button class="btn-delete" onclick="deleteQuote(${i})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function deleteQuote(index) {
+      const current = quoteText.innerText;
+      quotes.splice(index, 1);
+      renderQuotesList();
+      showToast("Quote deleted.");
+      // If no quotes left, clear the display
+      if (quotes.length === 0) {
+        quoteText.innerText   = "No quotes left. Add one!";
+        quoteAuthor.innerText = "";
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('open');
+    }
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+  </script>
+
+    </body>
+</html>
